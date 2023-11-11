@@ -1,0 +1,17 @@
+# Bỏ qua các file tạm thời và thư mục
+*.log
+*.tmp
+/temp/
+
+# Bỏ qua file cài đặt IDE
+.vscode/
+.idea/
+
+# Bỏ qua các file build và thư mục output
+/bin/
+/obj/
+/library/
+
+# Bỏ qua file cấu hình và secret
+/appsettings.json
+/secrets.txt
