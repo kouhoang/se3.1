@@ -5,7 +5,7 @@ using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
 [RequireComponent(typeof(ARRaycastManager))]
-public class SpawnObjectOnPlane : MonoBehaviour
+public class ModelInteract : MonoBehaviour
 {
     
     private ARRaycastManager raycastManager;
@@ -21,6 +21,9 @@ public class SpawnObjectOnPlane : MonoBehaviour
 
     static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
 
+    private Touch touch;
+    private Vector2 touchStartPos;
+
     private void Awake()
     {
         raycastManager = GetComponent<ARRaycastManager>();
@@ -28,11 +31,22 @@ public class SpawnObjectOnPlane : MonoBehaviour
 
     bool TryGetTouchPosition(out Vector2 touchPosition)
     {
-        if(Input.GetTouch(0).phase == TouchPhase.Began)
+        if (Input.touchCount > 0)
         {
-            touchPosition = Input.GetTouch(0).position;
-            return true;
+            touch = Input.GetTouch(0);
+
+            if (touch.phase == TouchPhase.Began)
+            {
+                touchStartPos = touch.position;
+            }
+
+            if (touch.phase == TouchPhase.Moved)
+            {
+                touchPosition = touch.position;
+                return true;
+            }
         }
+
         touchPosition = default;
         return false;
     }
@@ -47,9 +61,15 @@ public class SpawnObjectOnPlane : MonoBehaviour
         if(raycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinPolygon))
         {
             var hitPose = s_Hits[0].pose;
+
             if(placedPrefabCount < maxPrefabSpawnCount)
             {
                 SpawnPrefab(hitPose);
+            }
+
+            if (spawnedObject != null)
+            {
+                RotateAndMoveObject(touchPosition);
             }
         }
     }
@@ -65,5 +85,23 @@ public class SpawnObjectOnPlane : MonoBehaviour
         spawnedObject = Instantiate(placeablePrefab, hitPose.position, hitPose.rotation);
         placedPrefabList.Add(spawnedObject);
         placedPrefabCount++;
+    }
+    private void RotateAndMoveObject(Vector2 touchPosition)
+    {
+        // Calculate the rotation angle based on touch movement
+        float deltaX = touchPosition.x - touchStartPos.x;
+        float rotationAngle = deltaX * 0.5f;
+
+        // Rotate the spawned object
+        spawnedObject.transform.Rotate(Vector3.up, -rotationAngle);
+
+        // Update the touch starting position for the next frame
+        touchStartPos = touchPosition;
+
+        // Move the spawned object forward and backward based on touch movement
+        float deltaY = touchPosition.y - touchStartPos.y;
+        float moveDistance = deltaY * 0.01f;
+
+        spawnedObject.transform.Translate(Vector3.forward * moveDistance);
     }
 }
