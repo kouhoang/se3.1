@@ -11,6 +11,7 @@ public class ModelInteract : MonoBehaviour
     private ARRaycastManager raycastManager;
     private GameObject spawnedObject;
     private List<GameObject> placedPrefabList = new List<GameObject>();
+    private int state = 0;
 
     [SerializeField]
     private int maxPrefabSpawnCount =  0;
@@ -38,6 +39,8 @@ public class ModelInteract : MonoBehaviour
             if (touch.phase == TouchPhase.Began)
             {
                 touchStartPos = touch.position;
+                touchPosition = touch.position;
+                return true;
             }
 
             if (touch.phase == TouchPhase.Moved)
@@ -74,10 +77,9 @@ public class ModelInteract : MonoBehaviour
         }
     }
 
-    public void SetPrefabType(GameObject prefabType)
+    public void SetPrefabType(GameObject prefabChosen)
     {
-        placeablePrefab = prefabType;
-
+        placeablePrefab = prefabChosen;
     }
 
     private void SpawnPrefab(Pose hitPose)
@@ -86,6 +88,18 @@ public class ModelInteract : MonoBehaviour
         placedPrefabList.Add(spawnedObject);
         placedPrefabCount++;
     }
+
+    private void RemoveLastSpawnedPrefab()
+    {
+        if (placedPrefabList.Count > 0)
+        {
+            GameObject lastSpawnedPrefab = placedPrefabList[placedPrefabList.Count - 1];
+            Destroy(lastSpawnedPrefab);
+            placedPrefabList.RemoveAt(placedPrefabList.Count - 1);
+            placedPrefabCount--;
+        }
+    }
+
     private void RotateAndMoveObject(Vector2 touchPosition)
     {
         // Calculate the rotation angle based on touch movement
@@ -104,4 +118,6 @@ public class ModelInteract : MonoBehaviour
 
         spawnedObject.transform.Translate(Vector3.forward * moveDistance);
     }
+
+
 }
