@@ -11,7 +11,6 @@ public class ModelInteract : MonoBehaviour
     private ARRaycastManager raycastManager;
     private GameObject spawnedObject;
     private List<GameObject> placedPrefabList = new List<GameObject>();
-    private int state = 0;
 
     [SerializeField]
     private int maxPrefabSpawnCount =  0;
@@ -25,54 +24,43 @@ public class ModelInteract : MonoBehaviour
     private Touch touch;
     private Vector2 touchStartPos;
 
+    [SerializeField]
+    private float rotationSpeed = 1.0f;
+
+    [SerializeField]
+    private float moveSpeed = 0.01f;
+
     private void Awake()
     {
         raycastManager = GetComponent<ARRaycastManager>();
     }
 
-    bool TryGetTouchPosition(out Vector2 touchPosition)
+    private void Update()
     {
+
         if (Input.touchCount > 0)
         {
             touch = Input.GetTouch(0);
 
-            if (touch.phase == TouchPhase.Began)
+            if (raycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon))
             {
-                touchStartPos = touch.position;
-                touchPosition = touch.position;
-                return true;
-            }
+                var hitPose = s_Hits[0].pose;
+                if (touch.phase == TouchPhase.Began)
+                {
+                    touchStartPos = touch.position;
+                    if (placedPrefabCount < maxPrefabSpawnCount)
+                    {
+                        SpawnPrefab(hitPose);
+                    }
+                }
 
-            if (touch.phase == TouchPhase.Moved)
-            {
-                touchPosition = touch.position;
-                return true;
-            }
-        }
-
-        touchPosition = default;
-        return false;
-    }
-
-    private void Update()
-    {
-        if(!TryGetTouchPosition(out Vector2 touchPosition))
-        {
-            return;
-        }
-
-        if(raycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinPolygon))
-        {
-            var hitPose = s_Hits[0].pose;
-
-            if(placedPrefabCount < maxPrefabSpawnCount)
-            {
-                SpawnPrefab(hitPose);
-            }
-
-            if (spawnedObject != null)
-            {
-                RotateAndMoveObject(touchPosition);
+                if (touch.phase == TouchPhase.Moved)
+                {
+                    if (spawnedObject != null)
+                    {
+                        RotateAndMoveObject(touch.position);
+                    }
+                }
             }
         }
     }
@@ -89,7 +77,7 @@ public class ModelInteract : MonoBehaviour
         placedPrefabCount++;
     }
 
-    private void RemoveLastSpawnedPrefab()
+    public void RemoveLastSpawnedPrefab()
     {
         if (placedPrefabList.Count > 0)
         {
