@@ -7,13 +7,14 @@ using UnityEngine.XR.ARSubsystems;
 [RequireComponent(typeof(ARRaycastManager))]
 public class ModelInteract : MonoBehaviour
 {
-    
+    private ARPlaneManager arplaneManager;
     private ARRaycastManager raycastManager;
     private GameObject spawnedObject;
     private List<GameObject> placedPrefabList = new List<GameObject>();
 
     [SerializeField]
     private int maxPrefabSpawnCount =  0;
+
     private int placedPrefabCount;
 
     [SerializeField]
@@ -21,8 +22,14 @@ public class ModelInteract : MonoBehaviour
 
     static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
 
+    // Touch variables initiate
     private Touch touch;
     private Vector2 touchStartPos;
+    //private Vector2 firstTouch;
+    private Vector2 secondTouch;
+    private float distanceCurrent;
+    private float distancePrevious;
+    private bool firstPinch;
 
     [SerializeField]
     private float rotationSpeed = 1.0f;
@@ -32,36 +39,50 @@ public class ModelInteract : MonoBehaviour
 
     private void Awake()
     {
+        arplaneManager = GetComponent<ARPlaneManager>();
         raycastManager = GetComponent<ARRaycastManager>();
     }
 
     private void Update()
     {
-
+        if (spawnedObject == null)
+        {
+            raycastManager.enabled = true;
+            arplaneManager.enabled = true;
+        }
         if (Input.touchCount > 0)
         {
-            touch = Input.GetTouch(0);
-
-            if (raycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon))
+            if (raycastManager.Raycast(Input.GetTouch(0).position, s_Hits, TrackableType.PlaneWithinPolygon))
             {
-                var hitPose = s_Hits[0].pose;
-                if (touch.phase == TouchPhase.Began)
+                if (Input.GetTouch(0).phase == TouchPhase.Began)
                 {
-                    touchStartPos = touch.position;
-                    if (placedPrefabCount < maxPrefabSpawnCount)
+                    touchStartPos = Input.GetTouch(0).position;
+                    if (placedPrefabCount < maxPrefabSpawnCount && spawnedObject == null)
                     {
+                        var hitPose = s_Hits[0].pose;
                         SpawnPrefab(hitPose);
+                        raycastManager.enabled = false;
+                        arplaneManager.enabled = false;
                     }
                 }
 
-                if (touch.phase == TouchPhase.Moved)
+                if (Input.GetTouch(0).phase == TouchPhase.Moved)
                 {
                     if (spawnedObject != null)
                     {
-                        RotateAndMoveObject(touch.position);
+                        RotateAndMoveObject(Input.GetTouch(0).position);
                     }
                 }
             }
+        }
+        
+        if (Input.touchCount > 1)
+        {
+            PinchToScale();
+        }
+        else
+        {
+            firstPinch = true;
         }
     }
 
@@ -91,14 +112,14 @@ public class ModelInteract : MonoBehaviour
     private void RotateAndMoveObject(Vector2 touchPosition)
     {
         // Calculate the rotation angle based on touch movement
-        float deltaX = touchPosition.x - touchStartPos.x;
-        float rotationAngle = deltaX * 0.5f;
+        //float deltaX = touchPosition.x - touchStartPos.x;
+        //float rotationAngle = deltaX * 0.5f;
 
         // Rotate the spawned object
-        spawnedObject.transform.Rotate(Vector3.up, -rotationAngle);
+        //spawnedObject.transform.Rotate(Vector3.up, -rotationAngle);
 
         // Update the touch starting position for the next frame
-        touchStartPos = touchPosition;
+        //touchStartPos = touchPosition;
 
         // Move the spawned object forward and backward based on touch movement
         float deltaY = touchPosition.y - touchStartPos.y;
@@ -107,5 +128,23 @@ public class ModelInteract : MonoBehaviour
         spawnedObject.transform.Translate(Vector3.forward * moveDistance);
     }
 
+    private void PinchToScale()
+    {
+        //firstTouch = Input.GetTouch(0).position;
+        secondTouch = Input.GetTouch(1).position;
+        distanceCurrent = secondTouch.magnitude - touchStartPos.magnitude;
 
+        if(firstPinch)
+        {
+            distancePrevious = distanceCurrent;
+            firstPinch = false;
+        }
+
+        if(distanceCurrent != distancePrevious)
+        {
+            Vector3 scale_value = spawnedObject.transform.localScale * (distanceCurrent / distancePrevious);
+            spawnedObject.transform.localScale = scale_value;
+            distancePrevious = distanceCurrent;
+        }
+    }
 }

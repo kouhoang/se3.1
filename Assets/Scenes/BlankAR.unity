@@ -1402,10 +1402,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxPrefabSpawnCount: 1
-  placeablePrefab: {fileID: 7109551400477330752, guid: c666ec1864ba85a42a4bce1dd8c58092,
-    type: 3}
+  placeablePrefab: {fileID: 0}
   rotationSpeed: 1
-  moveSpeed: 0.01
+  moveSpeed: 0.5
 --- !u!114 &1659859602
 MonoBehaviour:
   m_ObjectHideFlags: 0
