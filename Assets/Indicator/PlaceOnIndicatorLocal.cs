@@ -124,7 +124,8 @@ public class PlaceOnIndicatorLocal : MonoBehaviour
     public void DestroyObject()
     {
         // Destroy spawned prefab
-        Destroy(spawnedObject);
+        if (spawnedObject != null)
+            Destroy(spawnedObject);
     }
         
 

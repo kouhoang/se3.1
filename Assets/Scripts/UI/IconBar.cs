@@ -6,20 +6,37 @@ using UnityEngine.UI;
 public class IconBar : MonoBehaviour
 {
     [SerializeField]
-    GameObject bg;
+    GameObject rotateBg;
+    [SerializeField]
+    GameObject listBg;
     bool isRotating = false;
+    bool isList = false;
     bool isHid = false;
     public void pressedRotate()
     {
         if (isRotating)
         {
             isRotating = false;
-            bg.SetActive(false);
+            rotateBg.SetActive(false);
         }
         else
         {
             isRotating = true;
-            bg.SetActive(true);
+            rotateBg.SetActive(true);
+        }
+    }
+
+    public void pressedList()
+    {
+        if (isList)
+        {
+            isList = false;
+            listBg.SetActive(false);
+        }
+        else
+        {
+            isList = true;
+            listBg.SetActive(true);
         }
     }
 
