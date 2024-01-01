@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using static UnityEngine.EventSystems.EventTrigger;
+using UnityEngine.EventSystems;
 
-public class MenuItem : MonoBehaviour, IPointerClickHandler
+public class OnClick : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField]
     public Entry trigger;

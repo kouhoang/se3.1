@@ -36,27 +36,49 @@ public class PlaceOnIndicatorLocal : MonoBehaviour
     void Update()
     {
         HandlePlacementIndicator();
-
-        // Check for touch or click to place the object
         if (Input.touchCount > 0)
         {
-            Touch touch = Input.GetTouch(0);
+            HandleFreeTouch();
+        }
+    }
+
+    public void resetPlane()
+    {
+        if (spawnedObject != null)
+            Destroy(spawnedObject);
+        ARSession session = FindObjectOfType<ARSession>();
+        if (session != null)
+            session.Reset();
+    }
+    public void rotateState()
+    {
+        if (isRotating)
+        {
+            isRotating = false;
+        }
+        else
+        {
+            isRotating = true;
+        }
+    }
+
+    void HandleFreeTouch()
+    {
+        // Check for touch or click to place the object
+        Touch touch = Input.GetTouch(0);
+
+        if (isRotating)
+        {
             if (touch.phase == TouchPhase.Began)
             {
-                if (!isRotating)
-                {
-                    PlaceObject();
-                }
-                else
-                {
-                    StartRotation(touch.position);
-                }
+                rotationStartPos = touch.position;
             }
-            else if (touch.phase == TouchPhase.Moved && isRotating)
+            if (touch.phase == TouchPhase.Moved)
             {
                 RotateObject(touch.position);
             }
         }
+        
     }
 
     void HandlePlacementIndicator()
@@ -72,13 +94,28 @@ public class PlaceOnIndicatorLocal : MonoBehaviour
                 placementIndicator.SetActive(true);
         }
     }
-
-    void PlaceObject()
+    /*
+     * if (spawnedObject == null)
+        {
+            if (touch.phase == TouchPhase.Began)
+            {
+                if (!isRotating && !isChoosing)
+                {
+                    PlaceObject();
+                }
+            }
+        }
+        else
+     */
+    public void PlaceObject()
     {
-        // If Object spawned or Indicator is out of plane site then ignore placement
-        if (!placementIndicator.activeInHierarchy || spawnedObject != null)
+        if (isRotating)
             return;
-
+        // If Object spawned or Indicator is out of plane site then ignore placement
+        if (!placementIndicator.activeInHierarchy)
+            return;
+        if (spawnedObject != null)
+            return;
         // Instantiate the currently selected prefab
         spawnedObject = Instantiate(availablePrefabs[currentPrefabIndex], placementIndicator.transform.position, placementIndicator.transform.rotation);
         placementIndicator.SetActive(false);
