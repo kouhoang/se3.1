@@ -25,5 +25,9 @@ AR Foundation và các gói AR tích hợp trên Unity
 glTFast: Cho phép import và export model có định dạng .gltf và .glb trong thực hiện sử dụng Unity
 https://github.com/atteneder/glTFast
 
+## Demo app
+https://drive.google.com/file/d/1RGAabWS9fmwjrbQqohFe5jao0ElYWbZL/view?usp=drive_link
+
+
 
 
