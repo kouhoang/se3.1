@@ -346,7 +346,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 941773376}
         m_TargetAssemblyTypeName: PlaceOnIndicatorLocal, Assembly-CSharp
-        m_MethodName: rotateState
+        m_MethodName: RotateState
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1988,7 +1988,8 @@ MonoBehaviour:
   - {fileID: 8694423109860978302, guid: 993d76869a600c741a601a288021f84c, type: 3}
   - {fileID: 2750675148369530436, guid: c85e206ef0c5a4b4a84ab7e505aa6334, type: 3}
   - {fileID: 4236581224019544256, guid: 9d81cc2ea70aa9043bc6e9d64947b40f, type: 3}
-  rotationSensitivity: 0.8
+  rotationSensitivity: 0.3
+  modelUrl: 
 --- !u!114 &941773377
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3837,6 +3838,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 790139097}
+        m_TargetAssemblyTypeName: IconBar, Assembly-CSharp
+        m_MethodName: pressedDelete
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1800763211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4421,7 +4434,19 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 941773376}
         m_TargetAssemblyTypeName: PlaceOnIndicatorLocal, Assembly-CSharp
-        m_MethodName: resetPlane
+        m_MethodName: ResetPlane
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 790139097}
+        m_TargetAssemblyTypeName: IconBar, Assembly-CSharp
+        m_MethodName: pressedDelete
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -26,6 +26,14 @@ public class IconBar : MonoBehaviour
         }
     }
 
+    public void pressedDelete()
+    {
+        if (isRotating)
+        {
+            isRotating = false;
+            rotateBg.SetActive(false);
+        }
+    }
     public void pressedList()
     {
         if (isList)
@@ -43,13 +51,14 @@ public class IconBar : MonoBehaviour
     public void ShowHide()
     {
         isHid = !isHid;
+        Vector3 axises = transform.position;
         if (isHid)
         {
-            transform.position = new Vector3(-60, 855, 0);
+            transform.position = new Vector3(-60, axises.y, axises.z);
         }
         else
         {
-            transform.position = new Vector3(60, 855, 0);
+            transform.position = new Vector3(60, axises.y, axises.z);
         }
     }
 }

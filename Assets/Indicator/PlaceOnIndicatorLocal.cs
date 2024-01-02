@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
@@ -26,23 +28,52 @@ public class PlaceOnIndicatorLocal : MonoBehaviour
     // Rotation variables
     private bool isRotating = false;
     private Vector2 rotationStartPos;
+    // Scale variables
+    private Vector2 firstTouch;
+    private Vector2 secondTouch;
+    private float distanceCurrent;
+    private float distancePrevious;
+    private bool firstPinch;
+
+    // LoadCloud variables
+    public string modelUrl;
+    private GameObject loadedModel;
 
     void Awake()
     {
         arRaycastManager = GetComponent<ARRaycastManager>();
         placementIndicator.SetActive(false);
+        //StartCoroutine(LoadModel(i.ToString()));
     }
 
     void Update()
     {
         HandlePlacementIndicator();
-        if (Input.touchCount > 0)
+        if (isRotating)
         {
             HandleFreeTouch();
         }
     }
 
-    public void resetPlane()
+    IEnumerator LoadModel(string modelName)
+    {
+        using (UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(modelUrl))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Failed to load model: " + www.error);
+            }
+            else
+            {
+                AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
+                loadedModel = Instantiate(bundle.LoadAsset<GameObject>(modelName));
+            }
+        }
+    }
+
+    public void ResetPlane()
     {
         if (spawnedObject != null)
             Destroy(spawnedObject);
@@ -50,7 +81,7 @@ public class PlaceOnIndicatorLocal : MonoBehaviour
         if (session != null)
             session.Reset();
     }
-    public void rotateState()
+    public void RotateState()
     {
         if (isRotating)
         {
@@ -65,20 +96,29 @@ public class PlaceOnIndicatorLocal : MonoBehaviour
     void HandleFreeTouch()
     {
         // Check for touch or click to place the object
-        Touch touch = Input.GetTouch(0);
-
-        if (isRotating)
+        if (Input.touchCount > 1)
         {
+            PinchToScale();
+            return;
+        }
+        else
+        {
+            firstPinch = true;
+        }
+
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
             if (touch.phase == TouchPhase.Began)
             {
                 rotationStartPos = touch.position;
             }
+            
             if (touch.phase == TouchPhase.Moved)
             {
                 RotateObject(touch.position);
             }
         }
-        
     }
 
     void HandlePlacementIndicator()
@@ -118,6 +158,7 @@ public class PlaceOnIndicatorLocal : MonoBehaviour
             return;
         // Instantiate the currently selected prefab
         spawnedObject = Instantiate(availablePrefabs[currentPrefabIndex], placementIndicator.transform.position, placementIndicator.transform.rotation);
+        spawnedObject.transform.Rotate(-90f, 0f, 0f);
         placementIndicator.SetActive(false);
     }
 
@@ -126,6 +167,8 @@ public class PlaceOnIndicatorLocal : MonoBehaviour
         // Destroy spawned prefab
         if (spawnedObject != null)
             Destroy(spawnedObject);
+        if (isRotating)
+            isRotating = false;
     }
         
 
@@ -139,8 +182,10 @@ public class PlaceOnIndicatorLocal : MonoBehaviour
         Debug.Log("Selected Prefab: " + availablePrefabs[currentPrefabIndex].name);
     }
 
+        /*
     void StartRotation(Vector2 touchPosition)
     {
+         * this is being bugged
         // Check if the touch is over the spawned object
         Ray ray = Camera.main.ScreenPointToRay(touchPosition);
         RaycastHit hit;
@@ -151,6 +196,7 @@ public class PlaceOnIndicatorLocal : MonoBehaviour
             rotationStartPos = touchPosition;
         }
     }
+         */
 
     void RotateObject(Vector2 touchPosition)
     {
@@ -159,9 +205,29 @@ public class PlaceOnIndicatorLocal : MonoBehaviour
         float rotationAngle = deltaRotation.x * rotationSensitivity;
 
         // Apply rotation to the spawned object
-        spawnedObject.transform.Rotate(Vector3.up, -rotationAngle);
+        spawnedObject.transform.Rotate(Vector3.forward, -rotationAngle);
 
         // Update the rotation start position for the next frame
         rotationStartPos = touchPosition;
+    }
+
+    private void PinchToScale()
+    {
+        firstTouch = Input.GetTouch(0).position;
+        secondTouch = Input.GetTouch(1).position;
+        distanceCurrent = secondTouch.magnitude - firstTouch.magnitude;
+
+        if (firstPinch)
+        {
+            distancePrevious = distanceCurrent;
+            firstPinch = false;
+        }
+
+        if (distanceCurrent != distancePrevious)
+        {
+            Vector3 scale_value = spawnedObject.transform.localScale * (distanceCurrent / distancePrevious);
+            spawnedObject.transform.localScale = scale_value;
+            distancePrevious = distanceCurrent;
+        }
     }
 }
