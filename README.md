@@ -5,7 +5,7 @@ Dựng một ứng dụng 3D/AR, đi từ việc tạo model đến việc sử 
 1. Đỗ Huy Hoàng - 21001551
 2. Ngô Hữu Hiếu - 21001547
 3. Nguyễn Hoàng Anh - 21001532
-4. Nguyễn Hoàng Đạo
+4. Nguyễn Hoàng Đạo - 21001542
 ***
 # Mô tả
 Ứng dụng Argumented Reality trên hệ điều hành Android sử dụng Google ARCore, AR Foundation và Unity
