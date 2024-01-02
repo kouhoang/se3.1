@@ -9,32 +9,32 @@ using UnityEngine.XR.ARSubsystems;
 public class PlaneDetectionToggle : MonoBehaviour
 {
     private ARPlaneManager planeManager;
-    [SerializeField]
-    private Text toggleButtonText;
+    //[SerializeField]
+    //private Text toggleButtonText;
  
     void Awake()
     {
         planeManager = GetComponent<ARPlaneManager>();
-        toggleButtonText.text = "Disable";
+        //toggleButtonText.text = "Disable";
     }
 
     public void TogglePlaneDetection()
     {
         planeManager.enabled = !planeManager.enabled;
-        string toggleButtonMessage = "";
+        //string toggleButtonMessage = "";
 
         if(planeManager.enabled)
         {
-            toggleButtonMessage = "Disable";
+            //toggleButtonMessage = "Disable";
             SetAllPlanesActive(true);
         }
         else
         {
-            toggleButtonMessage = "Enable";
+            //toggleButtonMessage = "Enable";
             SetAllPlanesActive(false);
         }
 
-        toggleButtonText.text = toggleButtonMessage;
+        //toggleButtonText.text = toggleButtonMessage;
     }
 
     private void SetAllPlanesActive(bool value)
