@@ -68,7 +68,8 @@ public class PlaceOnIndicatorLocal : MonoBehaviour
             else
             {
                 AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
-                loadedModel = Instantiate(bundle.LoadAsset<GameObject>(modelName));
+                loadedModel = bundle.LoadAsset<GameObject>(modelName);
+                availablePrefabs.Add(loadedModel);
             }
         }
     }
